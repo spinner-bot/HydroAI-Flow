@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440"
      role="img" aria-labelledby="heroTitle heroDesc">
-  <title id="heroTitle">HydroAI Flow — AI 辅助水动力建模与模拟</title>
-  <desc id="heroDesc">深色卡片头图：左侧为项目名称 HydroAI Flow 与副标题「AI-assisted Hydrodynamic Modeling &amp; Simulation」，
+  <title id="heroTitle">HydroAI-Flow — AI 辅助水动力建模与模拟</title>
+  <desc id="heroDesc">深色卡片头图：左侧为项目名称 HydroAI-Flow 与副标题「AI-assisted Hydrodynamic Modeling &amp; Simulation」，
   下方是项目三条主线标签「数值模拟 / 代理模型 / 参数率定」；右侧是两个同心旋转圆环环绕的发光核球，代表 AI 代理模型；
   底部是三层错速流动的波场，叠加 48 像素计算网格，代表水动力数值模拟的计算域。</desc>
 
