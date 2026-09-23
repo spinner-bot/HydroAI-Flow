@@ -1,0 +1,22 @@
+# ---- IDE ----
+# JetBrains（PyCharm / IntelliJ）工程配置，属本地环境产物，不同机器会互相冲突
+.idea/
+*.iml
+.vscode/
+
+# ---- 操作系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Python ----
+# 项目当前尚无代码，以下为后续开发预留；如不用 Python 可整段删除
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.ipynb_checkpoints/
+
+# ---- 密钥与环境变量 ----
+.env
