@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440"
+     role="img" aria-labelledby="heroTitle heroDesc">
+  <title id="heroTitle">HydroAI-Flow — AI 辅助水动力建模与模拟</title>
+  <desc id="heroDesc">深色卡片头图：左侧为项目名称 HydroAI-Flow 与副标题「AI-assisted Hydrodynamic Modeling &amp; Simulation」，
+  下方是项目三条主线标签「数值模拟 / 代理模型 / 参数率定」；右侧是两个同心旋转圆环环绕的发光核球，代表 AI 代理模型；
+  底部是三层错速流动的波场，叠加 48 像素计算网格，代表水动力数值模拟的计算域。</desc>
+
+  <style>
+    /* ===== Design tokens — 唯一色值定义处，其余位置一律 var() 引用 ===== */
+    :root {
+      --bg-0:        #061117;
+      --bg-1:        #0a2029;
+      --bg-2:        #071419;
+      --line:        #ffffff1c;
+      --text:        #effffc;
+      --muted:       #8ca9ab;
+      --mint:        #70efd5;
+      --blue:        #72c9ff;
+      --mint-soft:   #a8e9e1;
+      --glow-a:      #218c84;
+      --glow-b:      #5552b6;
+      --core-0:      #d4fff6;
+      --core-2:      #3389a7;
+      --core-3:      #20234e;
+      --mask-show:   #ffffff;
+      --mask-hide:   #000000;
+
+      /* 动效刻度：仅此三档 + 波场流速，不出现刻度外取值 */
+      --ease:        cubic-bezier(.22,.8,.25,1);
+      --dur-short:   6s;
+      --dur-mid:     18s;
+      --dur-long:    28s;
+      --flow-front:  16s;
+      --flow-mid:    22s;
+      --flow-back:   30s;
+    }
+
+    text { font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+
+    /* ===== 文字层级 ===== */
+    .eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; fill: var(--mint); }
+    .wordmark   { font-size: 62px; font-weight: 800; letter-spacing: -.035em; fill: url(#wordGrad); }
+    .subtitle   { font-size: 17px; font-weight: 400; fill: var(--muted); }
+    .chip-text  { font-size: 13px; font-weight: 600; fill: var(--muted); }
+
+    .frame      { fill: none; stroke: var(--line); stroke-width: 1; }
+    .chip       { fill: none; stroke: var(--line); stroke-width: 1; }
+    .grid       { stroke: var(--line); stroke-opacity: .28; stroke-width: 1; }
+
+    .ring-1     { fill: none; stroke: var(--mint); stroke-opacity: .27; stroke-width: 1;
+                  transform-box: fill-box; transform-origin: center;
+                  animation: spin var(--dur-long) linear infinite; }
+    .ring-2     { fill: none; stroke: var(--blue); stroke-opacity: .33; stroke-width: 1;
+                  stroke-dasharray: 10 8;
+                  transform-box: fill-box; transform-origin: center;
+                  animation: spin var(--dur-mid) linear infinite reverse; }
+
+    .glow       { fill: url(#coreGlow); animation: breathe var(--dur-short) var(--ease) infinite; }
+
+    .blob-wrap  { transform-box: fill-box; transform-origin: center;
+                  animation: drift var(--dur-short) var(--ease) infinite; }
+    .core-wave  { fill: none; stroke: var(--mint); stroke-opacity: .5; stroke-width: 1.5; stroke-linecap: round; }
+
+    /* 波场：位移循环动画必须 linear，否则每圈首尾会出现速度突变 */
+    .wave-back  { fill: var(--blue); opacity: .08; animation: flow var(--flow-back) linear infinite; }
+    .wave-mid   { fill: var(--mint); opacity: .10; animation: flow var(--flow-mid) linear infinite; }
+    .wave-front { fill: var(--mint); opacity: .18; animation: flow var(--flow-front) linear infinite; }
+    .core-flow  { animation: flow-core var(--flow-front) linear infinite; }
+
+    /* 位移距离 = 恰好一个波长，保证循环无缝 */
+    @keyframes spin    { to { transform: rotate(360deg); } }
+    @keyframes flow    { from { transform: translateX(0); } to { transform: translateX(-240px); } }
+    @keyframes flow-core { from { transform: translateX(0); } to { transform: translateX(-80px); } }
+    @keyframes drift   { 50% { transform: translateY(-10px) rotate(1.5deg); } }
+    @keyframes breathe { 50% { opacity: .55; } }
+
+    /* 尊重系统「减少动画」：保留完整构图，仅停止位移与旋转 */
+    @media (prefers-reduced-motion: reduce) {
+      .ring-1, .ring-2, .glow, .blob-wrap,
+      .wave-back, .wave-mid, .wave-front, .core-flow { animation: none; }
+    }
+  </style>
+
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   style="stop-color:var(--bg-0)"/>
+      <stop offset=".58" style="stop-color:var(--bg-1)"/>
+      <stop offset="1"   style="stop-color:var(--bg-2)"/>
+    </linearGradient>
+
+    <radialGradient id="glowTeal" cx=".12" cy=".18" r=".34">
+      <stop offset="0" style="stop-color:var(--glow-a); stop-opacity:.25"/>
+      <stop offset="1" style="stop-color:var(--glow-a); stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="glowIndigo" cx=".87" cy=".78" r=".4">
+      <stop offset="0" style="stop-color:var(--glow-b); stop-opacity:.25"/>
+      <stop offset="1" style="stop-color:var(--glow-b); stop-opacity:0"/>
+    </radialGradient>
+
+    <linearGradient id="wordGrad" x1="0" y1=".15" x2="1" y2=".85">
+      <stop offset="0"   style="stop-color:var(--text)"/>
+      <stop offset=".58" style="stop-color:var(--mint-soft)"/>
+      <stop offset="1"   style="stop-color:var(--blue)"/>
+    </linearGradient>
+
+    <radialGradient id="coreFill" cx=".3" cy=".25" r=".85">
+      <stop offset="0"   style="stop-color:var(--core-0)"/>
+      <stop offset=".25" style="stop-color:var(--mint)"/>
+      <stop offset=".64" style="stop-color:var(--core-2)"/>
+      <stop offset="1"   style="stop-color:var(--core-3)"/>
+    </radialGradient>
+    <radialGradient id="coreGlow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" style="stop-color:var(--mint); stop-opacity:.42"/>
+      <stop offset="1" style="stop-color:var(--mint); stop-opacity:0"/>
+    </radialGradient>
+
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path class="grid" d="M48 0 H0 V48" fill="none"/>
+    </pattern>
+    <linearGradient id="gridFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   style="stop-color:var(--mask-show)"/>
+      <stop offset=".88" style="stop-color:var(--mask-hide)"/>
+    </linearGradient>
+    <mask id="gridMask">
+      <rect width="1200" height="440" fill="url(#gridFade)"/>
+    </mask>
+
+    <path id="blobPath" d="M 0.0 -79.4 C 9.3 -80.5 20.7 -75.3 29.2 -70.5 C 37.7 -65.7 45.0 -58.1 50.8 -50.8 C 56.5 -43.4 61.2 -34.8 63.6 -26.3 C 65.9 -17.9 64.3 -9.0 64.9 0.0 C 65.4 9.0 67.8 17.9 66.7 27.6 C 65.6 37.3 64.5 51.3 58.2 58.2 C 51.9 65.1 38.4 68.1 28.7 69.2 C 19.0 70.2 9.1 65.7 0.0 64.6 C -9.1 63.5 -17.4 64.8 -25.9 62.6 C -34.4 60.3 -43.8 56.7 -51.1 51.1 C -58.3 45.4 -64.8 37.3 -69.5 28.8 C -74.1 20.3 -79.7 9.4 -79.1 0.0 C -78.6 -9.4 -72.2 -20.2 -66.3 -27.5 C -60.4 -34.7 -50.3 -37.6 -43.6 -43.6 C -37.0 -49.7 -33.7 -57.9 -26.5 -63.9 C -19.2 -69.8 -9.3 -78.3 0.0 -79.4 Z"/>
+    <clipPath id="blobClip"><use href="#blobPath"/></clipPath>
+
+    <clipPath id="frame"><rect width="1200" height="440" rx="20"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <!-- 底色与光晕 -->
+    <rect width="1200" height="440" fill="url(#bgGrad)"/>
+    <rect width="1200" height="440" fill="url(#glowTeal)"/>
+    <rect width="1200" height="440" fill="url(#glowIndigo)"/>
+
+    <!-- 计算域网格 -->
+    <rect width="1200" height="440" fill="url(#grid)" mask="url(#gridMask)"/>
+
+    <!-- 波场：三层错速，形成视差纵深 -->
+    <g clip-path="url(#frame)">
+      <path class="wave-back"  d="M -240 352 q 60 -48 120 0 q 60 48 120 0 q 60 -48 120 0 q 60 48 120 0 q 60 -48 120 0 q 60 48 120 0 q 60 -48 120 0 q 60 48 120 0 q 60 -48 120 0 q 60 48 120 0 q 60 -48 120 0 q 60 48 120 0 q 60 -48 120 0 q 60 48 120 0 q 60 -48 120 0 q 60 48 120 0 L 1680 440 L -240 440 Z"/>
+      <path class="wave-mid"   d="M -240 380 q 60 -56 120 0 q 60 56 120 0 q 60 -56 120 0 q 60 56 120 0 q 60 -56 120 0 q 60 56 120 0 q 60 -56 120 0 q 60 56 120 0 q 60 -56 120 0 q 60 56 120 0 q 60 -56 120 0 q 60 56 120 0 q 60 -56 120 0 q 60 56 120 0 q 60 -56 120 0 q 60 56 120 0 L 1680 440 L -240 440 Z"/>
+      <path class="wave-front" d="M -240 410 q 60 -64 120 0 q 60 64 120 0 q 60 -64 120 0 q 60 64 120 0 q 60 -64 120 0 q 60 64 120 0 q 60 -64 120 0 q 60 64 120 0 q 60 -64 120 0 q 60 64 120 0 q 60 -64 120 0 q 60 64 120 0 q 60 -64 120 0 q 60 64 120 0 q 60 -64 120 0 q 60 64 120 0 L 1680 440 L -240 440 Z"/>
+    </g>
+
+    <!-- AI 代理模型：同心环 + 发光核球 -->
+    <g transform="translate(930 200)">
+      <circle class="ring-1" r="155"/>
+      <circle class="ring-2" r="108"/>
+      <circle class="glow" r="132"/>
+      <g class="blob-wrap">
+        <use href="#blobPath" fill="url(#coreFill)"/>
+        <g clip-path="url(#blobClip)">
+          <g class="core-flow">
+            <path class="core-wave" d="M -120 -20 q 20 -16 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0"/>
+            <path class="core-wave" d="M -120 2 q 20 13 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0"/>
+            <path class="core-wave" d="M -120 24 q 20 -11 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0"/>
+          </g>
+        </g>
+      </g>
+    </g>
+
+    <!-- 左区文字 -->
+    <rect x="76" y="126" width="28" height="1" fill="var(--mint)"/>
+    <text class="eyebrow"  x="114" y="132">Water Dynamics · AI Surrogate Modeling</text>
+    <text class="wordmark" x="76"  y="204">HydroAI-Flow</text>
+    <text class="subtitle" x="76"  y="244">AI-assisted Hydrodynamic Modeling &amp; Simulation</text>
+
+    <rect class="chip" x="76"  y="274" width="88" height="36" rx="10"/>
+    <rect class="chip" x="172" y="274" width="88" height="36" rx="10"/>
+    <rect class="chip" x="268" y="274" width="88" height="36" rx="10"/>
+    <text class="chip-text" x="94"  y="297" text-anchor="start">数值模拟</text>
+    <text class="chip-text" x="190" y="297" text-anchor="start">代理模型</text>
+    <text class="chip-text" x="286" y="297" text-anchor="start">参数率定</text>
+  </g>
+
+  <rect class="frame" width="1200" height="440" rx="20"/>
+</svg>
