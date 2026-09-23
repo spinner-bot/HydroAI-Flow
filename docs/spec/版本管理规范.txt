@@ -1,0 +1,44 @@
+# 版本管理规范
+
+## 模块独立版本
+
+每个模块独立管理版本号，互不影响：
+
+- `time-helper/VERSION` — 当前 1.0.15
+- `plan-helper/VERSION` — 当前 0.2.0
+- `to-dos/VERSION` — 当前 0.1.0
+
+版本号格式：`主版本.次版本.修订号`
+- 主版本：重大更新，不兼容的改动
+- 次版本：新增功能，向下兼容
+- 修订号：问题修复，向下兼容
+
+## 更新日志
+
+每个模块维护自己的 `CHANGELOG.md`：
+- `time-helper/CHANGELOG.md`
+- `plan-helper/CHANGELOG.md`
+- `to-dos/CHANGELOG.md`
+
+## Git Tag
+
+使用模块名前缀：
+- `time-helper/v1.0.16`
+- `plan-helper/v0.2.0`
+- `to-dos/v0.1.0`
+
+## Commit 规范
+
+1. commit 必须尽可能频繁，以追踪过程。每次修改或创建文件，都要做一次commit，而不是等待所有文件改好。
+2. 单大文件的长任务（例如超长代码的修改或重构）按每文件1次commit仍然达不到要求，此时应每模块做一次commit。
+
+## 分支合并规范
+
+- 所有分支合并必须使用 `no-FF merge`，保留明确的合并提交。
+- 严禁使用 fast-forward 合并。
+- 合并示例：`git merge --no-ff <branch-name>`
+
+## 迭代工作流
+
+- 日常功能迭代直接在 `main` 分支进行，不再为每项任务创建功能分支。
+- 如需合并外部或历史分支，仍必须使用 `git merge --no-ff`，严禁 fast-forward。
