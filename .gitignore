@@ -20,3 +20,15 @@ venv/
 
 # ---- 密钥与环境变量 ----
 .env
+
+# ---- 项目数据与运行产物 ----
+# 原始数据和中间产物通常体积较大或受许可限制，不直接提交
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+experiments/*/artifacts/
+experiments/*/logs/
+outputs/
