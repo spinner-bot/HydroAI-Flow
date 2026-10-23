@@ -1,0 +1,80 @@
+一、HydroCraft 是什么（清华团队范本）
+论文：Tudaji, M., Tian, F., Wu, X. (2026). HydroCraft: an efficient online platform for hydrological modeling integrated with a large language model agent. Journal of Hydrology, 677, 135801. DOI: 10.1016/j.jhydrol.2026.135801
+- 网址：https://www.hydrocraft.hydr.tsinghua.edu.cn/ （校园网域名 hydr.tsinghua.edu.cn，田富强教授团队）
+- 核心套路（从摘要和引用它的论文中可以还原）：
+1. 网页平台，把“流域提取 → 数据自动生成 → 参数率定 → 结果可视化”全流程搬进浏览器，用户不需要安装任何软件；
+2. 内置 3 个水文过程模型，自带全球降水/气温/NDVI/LAI/土壤数据，用户不用准备任何数据集；
+3. 关键创新是集成 LLM Agent（基于 ChatGLM/GLM-4），Agent 负责理解用户自然语言需求，并按规定输出 JSON 格式去驱动平台各功能模块——“当已知信息齐备时，agent 必须生成规定格式的 JSON 并呈现给用户”（这是它论文里的核心设计，值得直接照搬）。
+一句话总结它的架构：“LLM 只负责理解需求 + 选模块 + 填参数（结构化 JSON），真正的数值计算和数据准备全部由确定性工具链完成”。这就是你要在 Delft3D 上复制的东西。
+二、必读文献清单
+1. 直接同类的“LLM 智能体 + 物理模型构建”文献
+文献	要点	对你的价值
+Tudaji et al. 2026, HydroCraft, J. Hydrol. 677:135801	清华水文平台，GLM-4 agent，JSON 驱动	架构范本，逐节点模仿
+Pursnani et al. 2024, HydroSuite-AI（EarthArXiv preprint，已被引10次+）	LLM 助手生成代码片段、执行计算、检索事实，封装水文库	LLM+科学计算库的封装方式
+Yan, S. et al. 2026, AI Agent for Hydrologic Modeling: Definition, Development (ESS Open Archive, 已被引4)	提出水文建模 AI Agent 自主性的六级框架（L1 提示回答 → L6 全自主建模标定），agent 集成自然语言查询/数据检索/模型配置	可直接拿来定义你们的“自主性等级”和研究卖点
+Grounding LLMs in hydrologic modelling（HydroAIM, 2026, ResearchGate 可下载）	LLM 智能体化水文时间序列建模	grounding（把 LLM 锚定在模型真实输入上）方法论
+灌溉渠系 LLM 调度论文（Comput. Electron. Agric. 2026, S0168169926010422）	LLM + SWMM + MCP + Dify 平台闭环：物理仿真器封装成 MCP server 给 LLM 调用，LLM 不改方程只做决策	“Delft3D as an MCP server” 的直接参照实现
+he et al. 2025, IWMS-LLM（智慧水务框架，被上述论文引用）	异构水务数据+政策文本的自然语言接入	数据接入层设计
+2. 近岸/海洋模型智能体（最接近你们场景的开源代码）
+- github.com/emmashie/model-agent（PNNL/伯克利团队，ROMS 自动建模智能体，强烈建议精读其 README 和目录结构）：
+- 5 个子智能体：grid_agent / init_agent / boundary_agent / forcing_agent / complete_agent
+- 流程：自然语言 → LLM 解析出研究区边界、日期、模拟目标 → LLM 给出有科学依据的参数建议（次中尺度用 ~1km、50 层、theta_s=7 等）→ 工具链下载 SRTM15+ 水深、GLORYS 温盐、ERA5 风场 → 自动生成可运行的 ROMS 模型
+- 全程 ~1–2 分钟出标准网格，失败自动回退到正则解析
+- 这就是“近岸版本 HydroCraft”的一个已存在原型，把目标模型从 ROMS 换成 Delft3D 即可
+3. 领域知识/评测类（用于建知识库和发配套论文）
+- Kizilkaya, Sermet, Demir: Towards HydroLLM（约 8800 条水文 QA 对，4 种题型）+ HydroLLM-Benchmark（Environmental Data Science 2025）→ 照此标准造一个 HydroDyn-LLM 问答/评测集
+- arXiv 2512.03672: 评测主流 LLM 的水利科学与工程知识水平（选底座模型前先读这个）
+- WaterGPT（Ren et al. 2024）、自主 GIS Agent（LLM+QGIS 自动生成地理处理流）文献线
+4. Delft3D 自动化工具链（你们的技术底座）
+工具	用途
+HydroMT (github.com/Deltares/hydromt) + HydroMT-Delft3D FM 插件 (deltares.github.io/hydromt_delft3dfm)	Deltares 官方模型构建框架：YAML 配置声明数据源 → 自动生成 D-Flow FM 全套模型，模块化、可复现。做 D-Flow FM 路线首选
+HYDROLIB-core	官方 Python 读写 D-Flow FM 输入文件（.mdu 等），Deltares 软件日有免费 Python 建模课程
+JulesBlm/pyDelft3D-FLOW (github.com/JulesBlm/pyDelft3D-FLOW)	读写经典 Delft3D4-FLOW 输入文件（.mdf 主控文件 + .grd/.dep/.enc/.bnd/.bcc 等 attribute 文件）——做 Delft3D4 曲线网格近岸路线的关键工具
+Delft3D-FLOW/WAVE User Manual + 官方 tutorials	Agent 知识库语料 + 基准测试案例
+RGFGRID（曲线网格）、TPXO/FES2014 潮汐模型、GEBCO/SRTM15+ 水深	网格、边界、地形数据源
+三、具体操作步骤（技术路线）
+第一步：选定技术路线（1周决策）
+两个选择，或双线并行：
+- 路线 A（传统 Delft3D4 + 近岸生态惯性大）：结构正交曲线网格 .grd/.dep/.mdf/.bnd/.bcc/.wnd，可耦合 SWAN 波浪。入口是 pyDelft3D-FLOW 读写这些文件。
+- 路线 B（D-Flow FM，非结构网格，推荐主打）：Deltares 持续开发，有 HydroMT 官方插件 + HYDROLIB-core Python 全开源栈，天然适合被 LLM agent 操纵。
+建议：平台主体做 D-Flow FM（HydroMT 路线），保留 Delft3D4 写出器作为兼容层。
+第二步：建“工具箱”——把 Delft3D 建模拆成原子工具（1–2个月）
+参照 ROMS model-agent 的拆法，每个工具是一个 Python 函数，签名清晰，供 agent function-calling 调用：
+1. 区位解析工具：地名/勾选地图范围 → lon/lat 边界（geopandas + LLM 常识地名表，如“渤海湾”“湄洲湾”）
+2. 网格生成工具：
+- D-Flow FM：非结构三角网（可封装 mesh2d 或调用 hydromt 的 mesh 模块），LLM 根据模拟目标建议分辨率（潮流模拟 100–300 m；河口/破碎带加密）
+- Delft3D4：自动化 RGFGRID 生成正交曲线网格（这一步工作量大，可先限定“规则矩形网格”降级实现）
+3. 地形工具：GEBCO/SRTM15+ 自动下载裁剪 → 插值到网格 → 干湿单元判定 → 写入
+4. 开边界工具：TPXO9/FES2014 全球潮汐模型调和分析 → 边界分潮水位（Q1/K1/O1/P1/M2/S2/N2/K2…）→ 写边界文件；这是近岸模型的核心，也是初学者最容易做错的地方，最值得由 AI 代劳
+5. 气象/径流工具：ERA5 风、热通量、气压 → 风场文件；主要河流 GRDC/实测径流 → 径流边界
+6. 配置文件生成器：pyDelft3D-FLOW（路线A）/ HYDROLIB-core（路线B）写出全套输入文件
+7. 运行器：调用 dimr（FM）/ delft3d4.exe（D4），再 Docker 化；读取 .dia 日志返回“成功/失败+错误行”
+8. 验证与率定工具：潮位/流速观测站数据匹配、NSE/RMSE/潮差相位误差；率定（底摩擦、糙率、涡粘）用 PEST 或 DDS/SCE-UA
+9. 后处理工具：netCDF → 流场动画、潮位过程线、淹没范围图
+原则（HydroCraft 和 SWMM 论文共同印证）：LLM 永远不直接算数值、不碰水动力方程的求解，只做“理解需求→调工具→填参数→解释错误”；一旦 LLM 不可用，工具链要能靠表单/正则回退运行。
+第三步：Agent 与知识层（与第二步并行，1–2个月）
+1. 知识库（RAG）：把 Delft3D-FLOW/WAVE 手册、官方 tutorial 案例说明、近岸建模论文、你们组内部经验文档切分入库；另建一张参数知识表：每个关键参数（时间步长/糙率/涡粘/边界松弛层/干湿临界水深/Courant 数…）的物理含义、典型取值、常配错误。
+2. JSON Schema 对话协议：照搬 HydroCraft 的做法——Agent 与用户多轮对话（研究区？时段？潮况？输出什么？），信息集齐后输出严格 JSON（如 {region, grid: {res_m: 200}, tides: {constituents:[...], open_boundary: ...}, time: {start, end, dt}, outputs: [...]}），校验通过才进工具链。
+3. 参数建议器：像 ROMS agent 那样，给出“有理由的建议”并让用户 Y/n 确认（例如“3 小时间隔出流场，网格最小 150 m，最大 Courant 0.5 → 建议 dt=60 s”）。
+4. 自纠错闭环：模型运行失败 → 解析 .dia 错误 → LLM 结合知识库诊断 → 修改参数 → 重跑，最多 N 轮。这是“降门槛”体验的灵魂。
+5. 底座模型：国内可用 GLM/Qwen/DeepSeek 系列 API（HydroCraft 用的就是 GLM-4，说明该方案在国内可行且有先例）；框架用 function calling / LangGraph，或参考 SWMM 论文用 MCP + Dify。
+第四步：Web 平台化（2–3个月）
+- 前端：Vue/Next.js + 地图组件（Mapbox/Leaflet），用户画框选区、点选站点；对话式主界面
+- 后端：FastAPI + Celery 任务队列；每类工具一个微服务；Delft3D 运行器放独立容器（Linux 用开源源码编译版或 wine 包一层）
+- 存算：网格与结果存对象存储 + PostgreSQL 元数据；算力池调度
+- 完全对标 HydroCraft：注册即用、浏览器里全流程、按流域/岸段建立“案例库”供一键复用
+第五步：验证与发表（贯穿）
+1. 基准测试：用 Delft3D 官方 tutorials + 你们组已发表的 3–5 个已用人工建好的近岸/河口案例，盲测平台能否从一句自然语言复现出等效模型（对比时间成本：人工 vs AI）；
+2. 评测集：出 HydroLLM 那样一份水动力建模问答基准（可单独发一篇）；
+3. 自主性分级：按 Yan et al. 六级框架给系统定位（先做到 L3–L4：agent 自动配置+自动纠错，率定由用户确认），未来路径清晰，审稿人喜欢；
+4. 目标期刊：J. Hydrology（HydroCraft 同刊）、Environmental Modelling & Software、Ocean Modelling、Computers & Geosciences。
+四、工作量与里程碑建议
+阶段	周期	交付
+M1	2–3 个月	问题域检索、测评
+M2	3–4 个月	网格+地形+潮汐+风=可运行模型，适合演示会
+M3	5–6 个月	自纠错 Agent、人工案例对比、用户测试、论文
+核心风险与对策：
+1. LLM 幻觉→全部数值参数过 Schema+物理规则校验（如 dt 由 Courant 数上限反算，不信任 LLM 给的数）；
+2. 近岸数据精度→免费地形（GEBCO ~450 m）和 TPXO 支持不了内湾级精度，要预留“上传海图/实测潮位站表”接口，让 AI 把用户数据也标准化接入；
+3. Delft3D4 曲线网格自动化难度高→MVP 阶段只支持矩形网格，曲线网格放 M3。
+最快起步路径：不急着写平台。先照 emmashie/model-agent 的方式写一个命令行 demo——一句中文（“帮我建一个湄洲湾 2024 年 6 月潮流模型，网格 200 米”）→ 自动下载 GEBCO+TPXO+ERA5 → 生成 D-Flow FM 全套文件并跑通。这个 demo 两三个月内可以实现，它既是技术上最关键的一步，也是论文里的核心方法部分。
